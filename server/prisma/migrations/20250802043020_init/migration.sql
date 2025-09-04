@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "public"."users" ADD COLUMN     "cash" DOUBLE PRECISION NOT NULL DEFAULT 10000;
