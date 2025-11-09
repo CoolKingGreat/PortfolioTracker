@@ -3,7 +3,6 @@ import { useParams } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import WidgetChart from "../components/WidgetChart";
 import { getDetailedStockData, getUserAssetInfo, purchaseStock, sellStock } from "../services/stockService";
-import DatePicker from "react-datepicker";
 
 const AssetOverviewPage = () => {
     const { ticker } = useParams();
