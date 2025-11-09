@@ -5,7 +5,7 @@ const clientOptions = process.env.REDIS_URL ? { url: process.env.REDIS_URL } : u
 
 const redisClient = createClient(clientOptions);
 
-redisClient.on('error', (err) => {
+redisClient.on('error', (err: Error) => {
   console.log('Redis Client Error', err);
 });
 
