@@ -1,12 +1,16 @@
-import { Request, Response, NextFunction } from "express"
-import jwt from "jsonwebtoken"
-import { prisma } from "../lib/prisma"
+import { Request, Response, NextFunction } from "express";
+import jwt, { JwtPayload } from "jsonwebtoken";
+import { prisma } from "../lib/prisma";
 
 interface AuthenticatedRequest extends Request {
-    user?: {
-        id: string,
-        username: string
-    } | null
+  user?: {
+    id: string;
+    username: string;
+  } | null;
+}
+
+interface MyJwtPayload extends JwtPayload {
+  id: string;
 }
 
 export const protect = async (req: AuthenticatedRequest, res: Response, next: NextFunction)=>{
@@ -15,7 +19,13 @@ export const protect = async (req: AuthenticatedRequest, res: Response, next: Ne
     if(req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
         try{
             token = req.headers.authorization.split(' ')[1]
-            const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as { id: string };
+
+            const secret = process.env.JWT_SECRET;
+            if (!secret) {
+                console.error("JWT_SECRET is not defined in environment variables.");
+                return res.status(500).json({ message: "Server configuration error." });
+            }
+            const decoded = jwt.verify(token!, secret!) as unknown as MyJwtPayload;
 
             req.user = await prisma.user.findUnique({
                 where: { id: decoded.id },

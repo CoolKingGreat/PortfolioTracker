@@ -1,8 +1,9 @@
 import { createClient } from 'redis';
 
-const redisClient = createClient({
-  url: process.env.REDIS_URL 
-});
+// Conditionally create the options object
+const clientOptions = process.env.REDIS_URL ? { url: process.env.REDIS_URL } : undefined;
+
+const redisClient = createClient(clientOptions);
 
 redisClient.on('error', (err) => {
   console.log('Redis Client Error', err);
@@ -10,8 +11,10 @@ redisClient.on('error', (err) => {
 
 (async () => {
   try {
-    await redisClient.connect();
-    console.log('Connected to Redis successfully!');
+    if (redisClient) {
+      await redisClient.connect();
+      console.log('Connected to Redis successfully!');
+    }
   } catch (err) {
     console.error('Could not connect to Redis:', err);
   }
