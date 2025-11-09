@@ -1,7 +1,13 @@
 import axios from "axios";
 
-const ASSET_API_URL = 'http://localhost:3000/api/assets';
-const STOCK_API_URL = 'http://localhost:3000/api/market/stock';
+// const ASSET_API_URL = `${process.env.REACT_APP_API_URL}/api/assets`;
+// const STOCK_API_URL = `${process.env.REACT_APP_API_URL}/api/market/stock`;
+
+// const ASSET_API_URL = 'http://localhost:3000/api/assets';
+// const STOCK_API_URL = 'http://localhost:3000/api/market/stock';
+
+const ASSET_API_URL = `${import.meta.env.VITE_API_URL}/api/assets`;
+const STOCK_API_URL = `${import.meta.env.VITE_API_URL}/api/market/stock`;
 
 const getAuthHeaders = (token: any) => ({
   headers: { Authorization: `Bearer ${token}` },

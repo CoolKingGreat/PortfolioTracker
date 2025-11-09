@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import "dotenv/config";
 import axios from "axios";
 import { prisma } from "../lib/prisma";
+import redisClient from "../lib/redis";
 
 export const getStockData = async (req: Request, res: Response) => {
     try {
@@ -31,6 +32,17 @@ export const getDetailedStockData = async (req: Request, res: Response) => {
         const { ticker, start, end, timeframe } = req.params;
         const ALPACA_KEY = process.env.ALPACA_KEY;
         const ALPACA_SECRET = process.env.ALPACA_SECRET;
+
+        const cacheKey = `stock:${ticker}:${start}:${end}:${timeframe}`;
+        if (redisClient.isReady) {
+            const cachedData = await redisClient.get(cacheKey);
+            if (cachedData) {
+                console.log("CACHE HIT:", cacheKey);
+                return res.status(200).json(JSON.parse(cachedData));
+            }
+        }
+        console.log("CACHE MISS:", cacheKey);
+
         const alpacaGet = {
             method: 'GET',
             url: `https://data.alpaca.markets/v2/stocks/bars?symbols=${ticker}&timeframe=${timeframe}&start=${start}T00:00:00Z&end=${end}&limit=1000&adjustment=all&feed=iex&sort=asc`,
@@ -41,6 +53,13 @@ export const getDetailedStockData = async (req: Request, res: Response) => {
             }
         };
         const alpacaResponse = (await axios.request(alpacaGet));
+
+        if (redisClient.isReady) {
+            await redisClient.set(cacheKey, JSON.stringify(alpacaResponse.data), {
+                EX: 3600 
+            });
+        }
+
         return res.status(200).json(alpacaResponse.data)
 
     } catch (err) {
