@@ -6,7 +6,8 @@ import assetRouter from "./routes/asset.routes"
 import cors from "cors";
 
 const app = express();
-const port = process.env.PORT || 3000;;
+const PORT = process.env.PORT || 3000;
+
 
 app.use(cors())
 app.use(express.json());
@@ -15,6 +16,6 @@ app.use("/api/market", marketRouter);
 app.use('/api/auth', authRouter);
 app.use("/api/assets", assetRouter)
 
-app.listen(port, ()=>{
-    console.log(`Listening to port ${port}`)
+app.listen(PORT, ()=>{
+    console.log(`Listening to port ${PORT}`)
 })
